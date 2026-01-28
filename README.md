@@ -172,6 +172,3 @@ In your repo settings, make the quay repo public. If you have a paid account, yo
         - `tag`: latest
 3. Deploy the application
 4. Test the application: Press `Test Application` > `Application URL`
-
-## Contact
-Liam Patty, CE Americas Top: Liam.Patty@ibm.com (Slack preferred)
