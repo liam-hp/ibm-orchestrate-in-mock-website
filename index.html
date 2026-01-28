@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WxO in Application Demo</title>
+    <link rel="icon" type="image/png" href="orchestrate_icon.png">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Embedded agent chat goes here, see https://developer.watson-orchestrate.ibm.com/agents/integrate_agents#embedding-agent-web-chat -->
+    <script>
+        window.wxOConfiguration = {
+            orchestrationID: "",
+            hostURL: "",
+            rootElementID: "root",
+            deploymentPlatform: "",
+            crn: "",
+            chatOptions: {
+                agentId: "",
+            },
+            layout: {
+                form: "fullscreen-overlay",
+                showLauncher: false,
+            }
+        };
+        
+        // Only load wxO if configuration is complete
+        if (window.wxOConfiguration.orchestrationID && window.wxOConfiguration.hostURL) {
+            setTimeout(function () {
+                const script = document.createElement('script');
+                script.src = `${window.wxOConfiguration.hostURL}/wxochat/wxoLoader.js?embed=true`;
+                script.addEventListener('load', function () {
+                    wxoLoader.init();
+                });
+                document.head.appendChild(script);
+            }, 0);
+        }
+    </script>
+
+</head>
+<body>
+    <div class="image-container">
+        <img src="ibm.jpeg" alt="IBM Image 1" class="stacked-image">
+    </div>
+    
+    <div class="controls">
+        <button id="helpBtn" onclick="openHelp()"> 📄 README </button>
+        <button id="pasteScriptBtn" class="attention-button" onclick="openPasteScript()">🤖 Embed Agent</button>
+        <button id="mockWebsiteBtn" class="attention-button" onclick="openMockWebsite()">📸 Mock Website</button>
+    </div>
+    
+    <!-- File input for image upload -->
+    <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(event)">
+    
+    <!-- Paste Script Modal -->
+    <div id="pasteScriptModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+            <h2>Embed Agent</h2>
+            
+            <!-- Security Warning - Expandable -->
+            <div style="background: rgba(255, 193, 7, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+                <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleSecurityInfo()">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">🔒</span>
+                        <p style="color: #0f62fe; font-size: 14px; margin: 0; font-weight: 600;">
+                            Security Configuration Required
+                        </p>
+                    </div>
+                    <span id="securityToggleIcon" style="color: #0f62fe; font-size: 20px; transition: transform 0.3s;">▼</span>
+                </div>
+                
+                <div id="securityInfoContent" style="display: none; margin-top: 15px; max-height: 300px; overflow-y: auto; padding-right: 10px;">
+                    <p style="color: #0f62fe; font-size: 13px; margin-bottom: 15px; line-height: 1.6;">
+                        <strong>Important:</strong> You must configure security settings for each agent you want to make available in webchat. Download and run the security tool to disable security and allow anonymous access.
+                    </p>
+                    
+                    <div style="background: rgba(15, 98, 254, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <h4 style="color: #0f62fe; font-size: 14px; margin-bottom: 10px;">📋 Quick Steps:</h4>
+                        <ol style="color: #0f62fe; font-size: 13px; line-height: 1.6; margin-left: 20px; margin-bottom: 0;">
+                            <li>Download the security tool using the button below</li>
+                            <li>Open terminal: <code style="background: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 4px; font-size: 12px; word-break: break-all;">chmod +x wxO-embed-chat-security-tool.sh</code></li>
+                            <li>Run: <code style="background: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 4px; font-size: 12px; word-break: break-all;">./wxO-embed-chat-security-tool.sh</code></li>
+                            <li>Follow prompts to disable security</li>
+                        </ol>
+                    </div>
+                    
+                    <button onclick="downloadSecurityScript()" class="generate-btn" style="width: 100%; margin-bottom: 10px;">
+                        📥 Download Security Configuration Tool
+                    </button>
+                    
+                    <p style="color: rgba(15, 98, 254, 0.8); font-size: 12px; margin: 0; text-align: center;">
+                        You'll need your Service Instance URL and API Key
+                    </p>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="scriptInput">Paste your wxO script here:</label>
+                <textarea id="scriptInput" placeholder="Copy your agent <script> from the Orchestrate UI agent editor at the bottom under 'Channels' -> 'Embedded agent' or using the orchestrate CLI with `orchestrate channels webchat embed --agent-name=test_agent1`"></textarea>
+            </div>
+            
+            <!-- Fullscreen Mode Checkbox -->
+            <div style="margin: 20px 0; padding: 15px; background: rgba(15, 98, 254, 0.05); border-radius: 8px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #0f62fe; font-size: 14px;">
+                    <input type="checkbox" id="fullscreenModeCheckbox" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span>⛶ Fullscreen Mode</span>
+                </label>
+                <p style="color: rgba(15, 98, 254, 0.8); font-size: 12px; margin: 8px 0 0 28px; line-height: 1.5;">
+                    Display the chat as a fullscreen overlay. No need to use the Mock Website feature when this is enabled.
+                </p>
+            </div>
+            
+            <div class="modal-buttons">
+                <button onclick="applyScript()" class="generate-btn">Apply Script</button>
+                <button onclick="closePasteScript()" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal hidden">
+        <div class="modal-content help-modal-content">
+            <h2>WxO in Application: Quickstart Mock Website</h2>
+            <p style="color: #0f62fe; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                This project is a quick and simple way to demo Watsonx Orchestrate agents to clients inside a mockup of their infrastructure to create a real visual experience.
+            </p>
+            
+            <h3 style="color: #0f62fe; font-size: 18px; margin-top: 25px; margin-bottom: 15px;">📋 End Result</h3>
+            <p style="color: #0f62fe; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+                An aesthetically exact though functionally simple mocked-up version of your client's website with your WxO agent embedded to demonstrate value in a real-world context.
+            </p>
+            
+            <h3 style="color: #0f62fe; font-size: 18px; margin-top: 25px; margin-bottom: 15px;">🖼️ Mock Your Client's Website</h3>
+            <div style="background: rgba(15, 98, 254, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <h4 style="color: #0f62fe; font-size: 16px; margin-bottom: 10px;">Option 1: Manual Upload</h4>
+                <ol style="color: #0f62fe; font-size: 14px; line-height: 1.8; margin-left: 20px;">
+                    <li>Navigate to your client's website and take screenshots all the way down</li>
+                    <li>For best results, take screenshots between vertical spaces</li>
+                    <li>Click "Mock Website" and select "Manual Upload"</li>
+                    <li>Upload your screenshots (they will stack vertically)</li>
+                </ol>
+            </div>
+            
+            <div style="background: rgba(15, 98, 254, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <h4 style="color: #0f62fe; font-size: 16px; margin-bottom: 10px;">Option 2: Auto Mockup</h4>
+                <ol style="color: #0f62fe; font-size: 14px; line-height: 1.8; margin-left: 20px;">
+                    <li>Create a free <a href="https://dash.screenshotone.com/access" target="_blank" style="color: #0f62fe; text-decoration: underline;">ScreenshotOne account</a> (100 free screenshots/month)</li>
+                    <li>Copy your API key from the dashboard</li>
+                    <li>Click "Mock Website" and select "Auto Mockup"</li>
+                    <li>Enter the website URL and your API key</li>
+                    <li>Optionally check "Download screenshot" to save a copy</li>
+                </ol>
+            </div>
+            
+            <h3 style="color: #0f62fe; font-size: 18px; margin-top: 25px; margin-bottom: 15px;">🤖 Embed Your Orchestrate Agent</h3>
+            <div style="background: rgba(15, 98, 254, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <h4 style="color: #0f62fe; font-size: 16px; margin-bottom: 10px;">Step 1: Get the Embed Script</h4>
+                <ol style="color: #0f62fe; font-size: 14px; line-height: 1.8; margin-left: 20px;">
+                    <li>Deploy your agent in watsonx Orchestrate</li>
+                    <li><strong>Option A (CLI):</strong> Run <code style="background: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 4px;">orchestrate channels webchat embed --agent-name=AGENT_NAME</code></li>
+                    <li><strong>Option B (SaaS UI):</strong> Navigate to Agent Builder → Channels → Embedded Agent section</li>
+                    <li>Copy the HTML script tag</li>
+                </ol>
+            </div>
+            
+            <div style="background: rgba(15, 98, 254, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <h4 style="color: #0f62fe; font-size: 16px; margin-bottom: 10px;">Step 2: Apply the Script</h4>
+                <ol style="color: #0f62fe; font-size: 14px; line-height: 1.8; margin-left: 20px;">
+                    <li>Click "Embed Agent" button</li>
+                    <li>Paste the entire script tag into the textarea</li>
+                    <li>Click "Apply Script"</li>
+                </ol>
+            </div>
+            
+            <div style="background: rgba(15, 98, 254, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <h4 style="color: #0f62fe; font-size: 16px; margin-bottom: 10px;">💡 Fullscreen Mode (Optional)</h4>
+                <p style="color: #0f62fe; font-size: 14px; line-height: 1.6; margin-bottom: 10px;">
+                    When embedding your agent, you can enable fullscreen mode by checking the "Enable Fullscreen Mode" checkbox. This mode:
+                </p>
+                <ul style="color: #0f62fe; font-size: 14px; line-height: 1.8; margin-left: 20px;">
+                    <li>Displays the chat interface as a fullscreen overlay</li>
+                    <li>Hides the mock website background</li>
+                    <li>Perfect for demos focused solely on the agent interaction</li>
+                    <li>No need to use the Mock Website feature when fullscreen is enabled</li>
+                </ul>
+            </div>
+            
+            <div style="background: rgba(255, 193, 7, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+                <h4 style="color: #0f62fe; font-size: 16px; margin-bottom: 10px;">⚠️ Step 3: Configure Security</h4>
+                <p style="color: #0f62fe; font-size: 14px; line-height: 1.6; margin-bottom: 10px;">
+                    You must disable security settings for each agent to allow anonymous access. The "Embed Agent" modal includes a download button for the security configuration tool.
+                </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="color: rgba(15, 98, 254, 0.8); font-size: 13px;">
+                    For more details, see <a href="https://developer.watson-orchestrate.ibm.com/agents/integrate_agents#embedding-agent-web-chat" target="_blank" style="color: #0f62fe; text-decoration: underline;">the documentation</a>
+                </p>
+            </div>
+            
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator">
+                <span class="scroll-indicator-text">↓ Scroll for more ↓</span>
+            </div>
+            
+            <div class="modal-buttons" style="margin-top: 30px;">
+                <button onclick="closeHelp()" class="cancel-btn" style="width: 100%;">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mock Website Modal -->
+    <div id="mockWebsiteModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <h2>Mock Website</h2>
+            <p style="color: #0f62fe; margin-bottom: 25px; font-size: 14px; text-align: center;">
+                Choose how you want to create your website mockup
+            </p>
+            
+            <!-- Option 1: Manual Upload -->
+            <div style="background: rgba(15, 98, 254, 0.05); padding: 20px; border-radius: 10px; margin-bottom: 15px; border: 2px solid rgba(15, 98, 254, 0.2); cursor: pointer; transition: all 0.3s;" onclick="selectManualUpload()">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                    <span style="font-size: 32px;">📤</span>
+                    <h3 style="color: #0f62fe; font-size: 18px; margin: 0;">Manual Upload</h3>
+                </div>
+                <p style="color: #0f62fe; font-size: 13px; margin: 0; line-height: 1.6;">
+                    Upload your own screenshots of the website. Perfect for custom mockups or when you already have images ready.
+                </p>
+            </div>
+            
+            <!-- Option 2: Auto Mockup -->
+            <div style="background: rgba(15, 98, 254, 0.05); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid rgba(15, 98, 254, 0.2); cursor: pointer; transition: all 0.3s;" onclick="selectAutoMockup()">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                    <span style="font-size: 32px;">🤖</span>
+                    <h3 style="color: #0f62fe; font-size: 18px; margin: 0;">Auto Mockup</h3>
+                </div>
+                <p style="color: #0f62fe; font-size: 13px; margin: 0; line-height: 1.6;">
+                    Automatically generate a full-page screenshot of any website. Requires a free ScreenshotOne API key.
+                </p>
+            </div>
+            
+            <!-- Auto Mockup Form (hidden by default) -->
+            <div id="autoMockupForm" style="display: none;">
+                <div style="border-top: 2px solid rgba(15, 98, 254, 0.2); padding-top: 20px; margin-top: 10px;">
+                    <div class="input-group">
+                        <label for="websiteUrl">Website URL:</label>
+                        <input type="url" id="websiteUrl" placeholder="https://example.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="apiKey">ScreenshotOne API Key: <a href="https://dash.screenshotone.com/access" target="_blank" style="font-size: 0.9em;">(Get API Key)</a></label>
+                        <input type="password" id="apiKey" placeholder="Enter your API key" required>
+                    </div>
+                    
+                    <!-- Download Screenshot Checkbox -->
+                    <div style="margin: 20px 0; padding: 15px; background: rgba(15, 98, 254, 0.05); border-radius: 8px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #0f62fe; font-size: 14px;">
+                            <input type="checkbox" id="downloadScreenshotCheckbox" style="width: 18px; height: 18px; cursor: pointer;">
+                            <span>📥 Save screenshot after generation</span>
+                        </label>
+                    </div>
+                    
+                    <div class="modal-buttons">
+                        <button onclick="generateMockup()" class="generate-btn">Generate Mockup</button>
+                        <button onclick="closeMockWebsite()" class="cancel-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cancel button (shown when form is hidden) -->
+            <div id="mockWebsiteCancel" class="modal-buttons">
+                <button onclick="closeMockWebsite()" class="cancel-btn" style="width: 100%;">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+
+</body>
+</html>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

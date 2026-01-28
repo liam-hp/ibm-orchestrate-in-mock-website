@@ -1,0 +1,14 @@
+{
+  "name": "wxo-in-website-sc",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "http-server -p 3000 -o",
+    "dev:8080": "http-server -p 8080 -o",
+    "start": "npm run dev"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
+
+

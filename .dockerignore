@@ -1,0 +1,8 @@
+node_modules
+.git
+.gitignore
+README.md
+package.json
+package-lock.json
+workspace_config.yaml
+.DS_Store

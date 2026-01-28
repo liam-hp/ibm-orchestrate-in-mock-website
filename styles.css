@@ -1,0 +1,434 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #0f62fe 0%, #0043ce 50%, #0f62fe 100%);
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    min-height: 100vh;
+}
+
+/* Fullscreen mode styles */
+body.fullscreen-mode {
+    background: #ffffff;
+}
+
+body.fullscreen-mode #root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+}
+
+/* Image container for vertical stacking */
+.image-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Stacked image styling */
+.stacked-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    margin: 0;
+    padding: 0;
+}
+
+/* Controls styling */
+.controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.controls button {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    padding: 18px 36px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f62fe;
+    text-transform: none;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 32px rgba(15, 98, 254, 0.3), 
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: subtleGlow 3s ease-in-out infinite;
+    width: 240px;
+    min-width: 240px;
+    backdrop-filter: blur(10px);
+}
+
+.controls button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(15, 98, 254, 0.4), 
+                0 6px 20px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(255, 255, 255, 1);
+    color: #0043ce;
+}
+
+.controls button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(15, 98, 254, 0.3), 
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.9);
+    color: #0f62fe;
+}
+
+/* Hide controls when they have the 'hidden' class */
+.controls.hidden {
+    display: none;
+}
+
+/* Hide individual buttons when they have the 'hidden' class */
+.controls button.hidden {
+    display: none;
+}
+
+/* Hide modal when it has the 'hidden' class */
+.modal.hidden {
+    display: none;
+}
+
+/* Subtle glow animation for the button */
+@keyframes subtleGlow {
+    0% {
+        box-shadow: 0 8px 32px rgba(15, 98, 254, 0.3), 
+                    0 4px 16px rgba(0, 0, 0, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+    50% {
+        box-shadow: 0 10px 36px rgba(15, 98, 254, 0.4), 
+                    0 5px 18px rgba(0, 0, 0, 0.25),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+    100% {
+        box-shadow: 0 8px 32px rgba(15, 98, 254, 0.3), 
+                    0 4px 16px rgba(0, 0, 0, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+}
+
+/* Attention buttons with red styling */
+.controls button.attention-button {
+    color: #dc3545;
+    box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3),
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    animation: redGlow 3s ease-in-out infinite;
+}
+
+.controls button.attention-button:hover {
+    box-shadow: 0 12px 40px rgba(220, 53, 69, 0.4),
+                0 6px 20px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    color: #c82333;
+}
+
+.controls button.attention-button:active {
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    color: #dc3545;
+}
+
+/* Red glow animation for attention buttons */
+@keyframes redGlow {
+    0% {
+        box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3),
+                    0 4px 16px rgba(0, 0, 0, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+    50% {
+        box-shadow: 0 10px 36px rgba(220, 53, 69, 0.5),
+                    0 5px 18px rgba(0, 0, 0, 0.25),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+    100% {
+        box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3),
+                    0 4px 16px rgba(0, 0, 0, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+}
+
+/* Modal styling */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(15, 98, 254, 0.95) 0%, rgba(0, 67, 206, 0.95) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(12px);
+}
+
+.modal-content {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 25px 80px rgba(15, 98, 254, 0.4), 
+                0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+}
+
+.modal-content h2 {
+    color: #0f62fe;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.input-group {
+    margin-bottom: 25px;
+}
+
+.input-group label {
+    display: block;
+    color: #0f62fe;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.input-group input,
+.input-group textarea {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid rgba(15, 98, 254, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #0f62fe;
+    font-size: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+    backdrop-filter: blur(10px);
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.input-group textarea {
+    resize: vertical;
+    min-height: 400px;
+    line-height: 1.5;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+    outline: none;
+    border-color: #0f62fe;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.2);
+}
+
+.input-group input::placeholder,
+.input-group textarea::placeholder {
+    color: rgba(15, 98, 254, 0.6);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.generate-btn {
+    background: rgba(255, 255, 255, 0.95);
+    color: #0f62fe;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    padding: 16px 32px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 20px rgba(15, 98, 254, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(15, 98, 254, 0.4);
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(255, 255, 255, 1);
+    color: #0043ce;
+}
+
+.generate-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.cancel-btn {
+    background: rgba(255, 255, 255, 0.95);
+    color: #0f62fe;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    padding: 16px 32px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 20px rgba(15, 98, 254, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.cancel-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(15, 98, 254, 0.4);
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(255, 255, 255, 1);
+    color: #0043ce;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .controls button {
+        padding: 16px 28px;
+        font-size: 15px;
+        width: 200px;
+        min-width: 200px;
+    }
+    
+    .modal-content {
+        padding: 32px 24px;
+        margin: 20px;
+        border-radius: 12px;
+    }
+    
+    .modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .modal-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .generate-btn,
+    .cancel-btn {
+        width: 100%;
+        padding: 14px 28px;
+    }
+}
+
+/* Loading Spinner */
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(15, 98, 254, 0.3);
+    border-top-color: #0f62fe;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Help Modal Specific Styles */
+.help-modal-content {
+    position: relative;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    /* Custom scrollbar for better visibility */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(15, 98, 254, 0.5) rgba(15, 98, 254, 0.1);
+}
+
+/* Webkit scrollbar styling */
+.help-modal-content::-webkit-scrollbar {
+    width: 12px;
+}
+
+.help-modal-content::-webkit-scrollbar-track {
+    background: rgba(15, 98, 254, 0.1);
+    border-radius: 10px;
+}
+
+.help-modal-content::-webkit-scrollbar-thumb {
+    background: rgba(15, 98, 254, 0.5);
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.95);
+}
+
+.help-modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 98, 254, 0.7);
+}
+
+/* Scroll indicator at bottom */
+.scroll-indicator {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 50%, transparent 100%);
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10px;
+    margin-top: -60px;
+    z-index: 10;
+}
+
+.scroll-indicator-text {
+    color: #0f62fe;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Hide scroll indicator when scrolled to bottom */
+.help-modal-content.scrolled-to-bottom .scroll-indicator {
+    display: none;
+}
+
